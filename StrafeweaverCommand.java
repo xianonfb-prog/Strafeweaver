@@ -107,7 +107,7 @@ public class StrafeweaverCommand implements CommandExecutor {
         }
 
         // Activate Ability: Haste 2 AND halves attack speed attribute (1.6 to 0.8)
-        player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 12 * 20, 1, false, false, false));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 12 * 20, 1, false, false, false));
         
         ItemMeta meta = hand.getItemMeta();
         meta.removeAttributeModifier(Attribute.GENERIC_ATTACK_SPEED);
