@@ -10,14 +10,15 @@ public class StrafeweaverPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        
-        // Initialize the manager (handles item creation and unique tracking)
+
         manager = new StrafeweaverManager(this);
-        
-        // Register Events and Commands
+
+        StrafeweaverCommand commandExecutor = new StrafeweaverCommand(this, manager);
+
         getServer().getPluginManager().registerEvents(new StrafeweaverListener(this, manager), this);
-        getCommand("strafeweaver").setExecutor(new StrafeweaverCommand(this, manager));
-        
+        getCommand("strafeweaver").setExecutor(commandExecutor);
+        getCommand("ability").setExecutor(commandExecutor);
+
         getLogger().info("Strafeweaver Plugin Enabled! The hunt begins...");
     }
 
@@ -29,7 +30,7 @@ public class StrafeweaverPlugin extends JavaPlugin {
     public static StrafeweaverPlugin getInstance() {
         return instance;
     }
-    
+
     public StrafeweaverManager getManager() {
         return manager;
     }
