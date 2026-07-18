@@ -1,4 +1,4 @@
-package com.yourserver.strafeweaver;
+package com.soulstealer;
 
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -27,7 +27,6 @@ public class StrafeweaverManager {
         this.uniqueIdKey = new NamespacedKey(plugin, "unique_id");
         this.speedLevelKey = new NamespacedKey(plugin, "speed_level");
 
-        // Load existing unique ID from config
         plugin.saveDefaultConfig();
         if (plugin.getConfig().contains("true_strafeweaver_uuid")) {
             trueStrafeUUID = plugin.getConfig().getString("true_strafeweaver_uuid");
@@ -49,17 +48,13 @@ public class StrafeweaverManager {
             ChatColor.YELLOW + "Ability: " + ChatColor.GRAY + "/strafeweaver ability"
         ));
 
-        // ==========================================
-        // UPDATED: Using GENERIC_ attributes and older AttributeModifier constructor
-        // This guarantees it will compile on GitHub's API version.
-        // ==========================================
+        // FIXED: Using GENERIC_ attributes to guarantee compilation
         meta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier(
             UUID.randomUUID(), "strafeweaver_damage", 8.0, AttributeModifier.Operation.ADD_NUMBER));
             
         meta.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(
             UUID.randomUUID(), "strafeweaver_speed", 1.6, AttributeModifier.Operation.ADD_NUMBER));
 
-        // Persistent Data
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
         pdc.set(isStrafeKey, PersistentDataType.BYTE, (byte) 1);
         pdc.set(speedLevelKey, PersistentDataType.INTEGER, 0);
@@ -69,7 +64,6 @@ public class StrafeweaverManager {
 
         sword.setItemMeta(meta);
         
-        // Save as the one true Strafeweaver
         trueStrafeUUID = newUUID;
         plugin.getConfig().set("true_strafeweaver_uuid", newUUID);
         plugin.saveConfig();
