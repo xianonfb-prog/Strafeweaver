@@ -2,12 +2,12 @@ name: Strafeweaver
 version: 1.0
 main: com.strafeweaver.StrafeweaverPlugin
 api-version: '1.21'
-author: Soulstealer
+author: Strafeweaver
 
 commands:
   strafeweaver:
     description: Main command for the Strafeweaver artifact.
-    usage: /strafeweaver give
+    usage: /strafeweaver <give|ability>
     permission: strafeweaver.use
   ability:
     description: Activates the Strafeweaver Sword's ability
