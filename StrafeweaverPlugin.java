@@ -1,4 +1,4 @@
-package com.yourserver.strafeweaver;
+package com.strafeweaver;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
