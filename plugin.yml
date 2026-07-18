@@ -1,0 +1,21 @@
+name: Strafeweaver
+version: '${project.version}'
+main: com.yourserver.strafeweaver.StrafeweaverPlugin
+api-version: '1.21'
+authors: [YourName]
+description: The one-of-a-kind Strafeweaver artifact.
+
+commands:
+  strafeweaver:
+    description: Main command for the Strafeweaver artifact.
+    usage: /<command> give [force] | ability
+    permission: strafeweaver.use
+    aliases: [strafe]
+
+permissions:
+  strafeweaver.use:
+    description: Allows using the Strafeweaver ability.
+    default: true
+  strafeweaver.give:
+    description: Allows spawning the unique Strafeweaver.
+    default: op
