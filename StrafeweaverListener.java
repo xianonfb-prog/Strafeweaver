@@ -56,6 +56,15 @@ public class StrafeweaverListener implements Listener {
         ItemStack weapon = attacker.getInventory().getItemInMainHand();
         if (!manager.isStrafeweaver(weapon)) return;
 
+        // ==========================================
+        // CHARGED HIT CHECK (Prevents Spam Clicking)
+        // ==========================================
+        // A fully charged hit is 1.0F. We use 0.95F to ensure it's a real, timed swing.
+        if (attacker.getAttackCooldown() < 0.95F) {
+            return; // Ignore weak/spam hits. Combo does not increment.
+        }
+        // ==========================================
+
         UUID attUUID = attacker.getUniqueId();
         UUID vicUUID = victim.getUniqueId();
 
@@ -106,7 +115,9 @@ public class StrafeweaverListener implements Listener {
         }
     }
 
-    // Handle the "Reset if they hit you" logic
+    // ==========================================
+    // RESET LOGIC (If they hit you back)
+    // ==========================================
     @EventHandler
     public void onPlayerHit(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Player victim)) return;
