@@ -35,82 +35,107 @@ public class StrafeweaverCommand implements CommandExecutor {
             return true;
         }
 
-        if (args.length == 0) {
-            player.sendMessage(ChatColor.AQUA + "Strafeweaver Commands:");
-            player.sendMessage(ChatColor.GRAY + "/strafeweaver give [force]");
-            player.sendMessage(ChatColor.GRAY + "/strafeweaver ability");
-            return true;
-        }
+        String cmdName = command.getName().toLowerCase();
 
-        // --- GIVE COMMAND ---
-        if (args[0].equalsIgnoreCase("give")) {
-            if (!player.hasPermission("strafeweaver.give")) {
-                player.sendMessage(ChatColor.RED + "No permission.");
+        // ==========================================
+        // HANDLE /strafeweaver COMMAND
+        // ==========================================
+        if (cmdName.equals("strafeweaver")) {
+            if (args.length == 0) {
+                player.sendMessage(ChatColor.AQUA + "Strafeweaver Commands:");
+                player.sendMessage(ChatColor.GRAY + "/strafeweaver give [force]");
+                player.sendMessage(ChatColor.GRAY + "/strafeweaver ability (or just /ability)");
                 return true;
             }
 
-            boolean force = args.length > 1 && args[1].equalsIgnoreCase("force");
-
-            if (!force && manager.doesStrafeExistInWorld()) {
-                player.sendMessage(ChatColor.RED + "The Strafeweaver already exists in this world! Use '/strafeweaver give force' to overwrite.");
-                return true;
-            }
-
-            player.getInventory().addItem(manager.createStrafeweaver());
-            player.sendMessage(ChatColor.AQUA + "You have forged the one and only Strafeweaver!");
-            return true;
-        }
-
-        // --- ABILITY COMMAND ---
-        if (args[0].equalsIgnoreCase("ability")) {
-            ItemStack hand = player.getInventory().getItemInMainHand();
-            if (!manager.isStrafeweaver(hand)) {
-                player.sendMessage(ChatColor.RED + "You must be holding the Strafeweaver!");
-                return true;
-            }
-
-            long cooldownMs = 120_000;
-            long now = System.currentTimeMillis();
-            if (abilityCooldowns.containsKey(player.getUniqueId())) {
-                long nextUse = abilityCooldowns.get(player.getUniqueId());
-                if (now < nextUse) {
-                    player.sendMessage(ChatColor.RED + "Ability on cooldown for " + ((nextUse - now) / 1000) + "s.");
+            // --- GIVE SUBCOMMAND ---
+            if (args[0].equalsIgnoreCase("give")) {
+                if (!player.hasPermission("strafeweaver.give")) {
+                    player.sendMessage(ChatColor.RED + "No permission.");
                     return true;
                 }
+
+                boolean force = args.length > 1 && args[1].equalsIgnoreCase("force");
+
+                if (!force && manager.doesStrafeExistInWorld()) {
+                    player.sendMessage(ChatColor.RED + "The Strafeweaver already exists! Use '/strafeweaver give force'.");
+                    return true;
+                }
+
+                player.getInventory().addItem(manager.createStrafeweaver());
+                player.sendMessage(ChatColor.AQUA + "You have forged the one and only Strafeweaver!");
+                return true;
             }
 
-            player.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 12 * 20, 1, false, false, false));
-            
-            ItemMeta meta = hand.getItemMeta();
-            
-            // FIXED: Using GENERIC_ attributes to guarantee compilation
-            meta.removeAttributeModifier(Attribute.GENERIC_ATTACK_SPEED);
-            meta.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(
-                UUID.randomUUID(), "strafeweaver_speed_ability", 0.8, AttributeModifier.Operation.ADD_NUMBER));
-            hand.setItemMeta(meta);
+            // --- ABILITY SUBCOMMAND ---
+            if (args[0].equalsIgnoreCase("ability")) {
+                executeAbility(player);
+                return true;
+            }
+        }
 
-            player.sendMessage(ChatColor.YELLOW + "Strafeweaver Overdrive! (12s)");
-            player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0f, 2.0f);
-
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (manager.isStrafeweaver(hand)) {
-                        ItemMeta m = hand.getItemMeta();
-                        m.removeAttributeModifier(Attribute.GENERIC_ATTACK_SPEED);
-                        
-                        m.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(
-                            UUID.randomUUID(), "strafeweaver_speed", 1.6, AttributeModifier.Operation.ADD_NUMBER));
-                        hand.setItemMeta(m);
-                        player.sendMessage(ChatColor.GRAY + "Overdrive faded.");
-                    }
-                }
-            }.runTaskLater(plugin, 12 * 20);
-
-            abilityCooldowns.put(player.getUniqueId(), now + cooldownMs);
+        // ==========================================
+        // HANDLE STANDALONE /ability COMMAND
+        // ==========================================
+        if (cmdName.equals("ability")) {
+            executeAbility(player);
             return true;
         }
 
         return false;
+    }
+
+    // ==========================================
+    // EXTRACTED ABILITY LOGIC
+    // ==========================================
+    private void executeAbility(Player player) {
+        ItemStack hand = player.getInventory().getItemInMainHand();
+        if (!manager.isStrafeweaver(hand)) {
+            player.sendMessage(ChatColor.RED + "You must be holding the Strafeweaver!");
+            return;
+        }
+
+        // Check Cooldown (120 seconds)
+        long cooldownMs = 120_000;
+        long now = System.currentTimeMillis();
+        if (abilityCooldowns.containsKey(player.getUniqueId())) {
+            long nextUse = abilityCooldowns.get(player.getUniqueId());
+            if (now < nextUse) {
+                player.sendMessage(ChatColor.RED + "Ability on cooldown for " + ((nextUse - now) / 1000) + "s.");
+                return;
+            }
+        }
+
+        // Activate Ability: Haste 2 AND halves attack speed attribute (1.6 to 0.8)
+        player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 12 * 20, 1, false, false, false));
+        
+        ItemMeta meta = hand.getItemMeta();
+        meta.removeAttributeModifier(Attribute.GENERIC_ATTACK_SPEED);
+        meta.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(
+            UUID.randomUUID(), "strafeweaver_speed_ability", 0.8, AttributeModifier.Operation.ADD_NUMBER));
+        hand.setItemMeta(meta);
+
+        player.sendMessage(ChatColor.YELLOW + "Strafeweaver Overdrive! (12s)");
+        player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0f, 2.0f);
+
+        // Revert after 12 seconds
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (manager.isStrafeweaver(hand)) {
+                    ItemMeta m = hand.getItemMeta();
+                    m.removeAttributeModifier(Attribute.GENERIC_ATTACK_SPEED);
+                    
+                    // Revert back to 1.6
+                    m.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(
+                        UUID.randomUUID(), "strafeweaver_speed", 1.6, AttributeModifier.Operation.ADD_NUMBER));
+                    hand.setItemMeta(m);
+                    player.sendMessage(ChatColor.GRAY + "Overdrive faded.");
+                }
+            }
+        }.runTaskLater(plugin, 12 * 20);
+
+        // Set Cooldown
+        abilityCooldowns.put(player.getUniqueId(), now + cooldownMs);
     }
 }
