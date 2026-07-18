@@ -1,4 +1,4 @@
-package com.yourserver.strafeweaver;
+package com.soulstealer;
 
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -69,7 +69,6 @@ public class StrafeweaverCommand implements CommandExecutor {
                 return true;
             }
 
-            // Check Cooldown (120 seconds)
             long cooldownMs = 120_000;
             long now = System.currentTimeMillis();
             if (abilityCooldowns.containsKey(player.getUniqueId())) {
@@ -80,15 +79,12 @@ public class StrafeweaverCommand implements CommandExecutor {
                 }
             }
 
-            // Activate Ability: Haste 2 AND halves attack speed attribute (1.6 to 0.8)
             player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 12 * 20, 1, false, false, false));
             
             ItemMeta meta = hand.getItemMeta();
-            meta.removeAttributeModifier(Attribute.GENERIC_ATTACK_SPEED);
             
-            // ==========================================
-            // UPDATED: Using older AttributeModifier constructor
-            // ==========================================
+            // FIXED: Using GENERIC_ attributes to guarantee compilation
+            meta.removeAttributeModifier(Attribute.GENERIC_ATTACK_SPEED);
             meta.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(
                 UUID.randomUUID(), "strafeweaver_speed_ability", 0.8, AttributeModifier.Operation.ADD_NUMBER));
             hand.setItemMeta(meta);
@@ -96,7 +92,6 @@ public class StrafeweaverCommand implements CommandExecutor {
             player.sendMessage(ChatColor.YELLOW + "Strafeweaver Overdrive! (12s)");
             player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0f, 2.0f);
 
-            // Revert after 12 seconds
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -104,7 +99,6 @@ public class StrafeweaverCommand implements CommandExecutor {
                         ItemMeta m = hand.getItemMeta();
                         m.removeAttributeModifier(Attribute.GENERIC_ATTACK_SPEED);
                         
-                        // Revert back to 1.6
                         m.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(
                             UUID.randomUUID(), "strafeweaver_speed", 1.6, AttributeModifier.Operation.ADD_NUMBER));
                         hand.setItemMeta(m);
