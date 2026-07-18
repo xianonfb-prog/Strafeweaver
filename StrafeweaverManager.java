@@ -1,4 +1,4 @@
-package com.soulstealer;
+package com.strafeweaver;
 
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
