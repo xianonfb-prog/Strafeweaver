@@ -7,7 +7,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
@@ -82,13 +81,16 @@ public class StrafeweaverCommand implements CommandExecutor {
             }
 
             // Activate Ability: Haste 2 AND halves attack speed attribute (1.6 to 0.8)
-            player.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 12 * 20, 1, false, false, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 12 * 20, 1, false, false, false));
             
             ItemMeta meta = hand.getItemMeta();
-            meta.removeAttributeModifier(Attribute.ATTACK_SPEED);
-            meta.addAttributeModifier(Attribute.ATTACK_SPEED, new AttributeModifier(
-                NamespacedKey.fromString("strafeweaver:speed_ability"), 0.8, 
-                AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND));
+            meta.removeAttributeModifier(Attribute.GENERIC_ATTACK_SPEED);
+            
+            // ==========================================
+            // UPDATED: Using older AttributeModifier constructor
+            // ==========================================
+            meta.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(
+                UUID.randomUUID(), "strafeweaver_speed_ability", 0.8, AttributeModifier.Operation.ADD_NUMBER));
             hand.setItemMeta(meta);
 
             player.sendMessage(ChatColor.YELLOW + "Strafeweaver Overdrive! (12s)");
@@ -100,10 +102,11 @@ public class StrafeweaverCommand implements CommandExecutor {
                 public void run() {
                     if (manager.isStrafeweaver(hand)) {
                         ItemMeta m = hand.getItemMeta();
-                        m.removeAttributeModifier(Attribute.ATTACK_SPEED);
-                        m.addAttributeModifier(Attribute.ATTACK_SPEED, new AttributeModifier(
-                            NamespacedKey.fromString("strafeweaver:speed"), 1.6, 
-                            AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND));
+                        m.removeAttributeModifier(Attribute.GENERIC_ATTACK_SPEED);
+                        
+                        // Revert back to 1.6
+                        m.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(
+                            UUID.randomUUID(), "strafeweaver_speed", 1.6, AttributeModifier.Operation.ADD_NUMBER));
                         hand.setItemMeta(m);
                         player.sendMessage(ChatColor.GRAY + "Overdrive faded.");
                     }
