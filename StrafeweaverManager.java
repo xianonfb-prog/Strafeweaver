@@ -4,7 +4,6 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -50,14 +49,15 @@ public class StrafeweaverManager {
             ChatColor.YELLOW + "Ability: " + ChatColor.GRAY + "/strafeweaver ability"
         ));
 
-        // 1.21 Attribute Modifiers
-        meta.addAttributeModifier(Attribute.ATTACK_DAMAGE, new AttributeModifier(
-            NamespacedKey.fromString("strafeweaver:damage"), 8.0, 
-            AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND));
+        // ==========================================
+        // UPDATED: Using GENERIC_ attributes and older AttributeModifier constructor
+        // This guarantees it will compile on GitHub's API version.
+        // ==========================================
+        meta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier(
+            UUID.randomUUID(), "strafeweaver_damage", 8.0, AttributeModifier.Operation.ADD_NUMBER));
             
-        meta.addAttributeModifier(Attribute.ATTACK_SPEED, new AttributeModifier(
-            NamespacedKey.fromString("strafeweaver:speed"), 1.6, 
-            AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND));
+        meta.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(
+            UUID.randomUUID(), "strafeweaver_speed", 1.6, AttributeModifier.Operation.ADD_NUMBER));
 
         // Persistent Data
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
