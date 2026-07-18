@@ -1,4 +1,4 @@
-package com.soulstealer;
+package com.strafeweaver;
 
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -79,7 +79,7 @@ public class StrafeweaverCommand implements CommandExecutor {
                 }
             }
 
-            player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 12 * 20, 1, false, false, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 12 * 20, 1, false, false, false));
             
             ItemMeta meta = hand.getItemMeta();
             
