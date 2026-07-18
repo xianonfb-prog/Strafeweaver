@@ -7,7 +7,7 @@ author: Soulstealer
 commands:
   strafeweaver:
     description: Main command for the Strafeweaver artifact.
-    usage: /strafeweaver <give|ability>
+    usage: /strafeweaver give
     permission: strafeweaver.use
   ability:
     description: Activates the Strafeweaver Sword's ability
